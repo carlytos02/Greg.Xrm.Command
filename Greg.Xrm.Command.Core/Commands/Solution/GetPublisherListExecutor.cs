@@ -93,21 +93,21 @@ namespace Greg.Xrm.Command.Commands.Solution
 		}
 		private Func<Entity, string[]> publisherListData(bool verbose)
 		{
-			return (user) =>
+			return (publisher) =>
 			{
 				string[] values = {
-					user.GetAttributeValue<string>("uniquename") ?? string.Empty,
-					user.GetAttributeValue<string>("friendlyname") ?? string.Empty,
-					user.GetAttributeValue<string>("customizationprefix") ?? string.Empty
+					publisher.GetAttributeValue<string>("uniquename") ?? string.Empty,
+					publisher.GetAttributeValue<string>("friendlyname") ?? string.Empty,
+					publisher.GetAttributeValue<string>("customizationprefix") ?? string.Empty
 				};
 
 				if (verbose)
 				{
 					values = values.Concat(new[] {
-						user.GetFormattedValue("customizationoptionvalueprefix") ?? string.Empty,
-						user.GetAttributeValue<DateTime?>("createdon").GetValueOrDefault().ToLocalTime().ToString() ?? string.Empty,
-						user.GetFormattedValue("createdby") ?? string.Empty,
-						user.GetAttributeValue<string>("description") ?? string.Empty						
+						publisher.GetFormattedValue("customizationoptionvalueprefix") ?? string.Empty,
+						publisher.GetAttributeValue<DateTime?>("createdon").GetValueOrDefault().ToLocalTime().ToString() ?? string.Empty,
+						publisher.GetFormattedValue("createdby") ?? string.Empty,
+						publisher.GetAttributeValue<string>("description") ?? string.Empty						
 					}).ToArray();
 				}
 
