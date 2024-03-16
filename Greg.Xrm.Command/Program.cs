@@ -27,13 +27,16 @@ serviceCollection.AddTransient<ISettingsRepository, SettingsRepository>();
 serviceCollection.AddSingleton<IOrganizationServiceRepository, OrganizationServiceRepository>();
 serviceCollection.AddSingleton<IOutput, OutputToConsole>();
 serviceCollection.AddTransient<IHistoryTracker, HistoryTracker>();
+
+serviceCollection.AddTransient<PromptDebuggerBootstrapper>();
 serviceCollection.AddTransient<Bootstrapper>();
+
 
 serviceCollection.AddAutofac();
 serviceCollection.AddLogging(logging =>
 {
-	logging.ClearProviders();
-	logging.AddDebug();
+    logging.ClearProviders();
+    logging.AddDebug();
 });
 
 
@@ -44,32 +47,36 @@ var container = containerBuilder.Build();
 
 using (var scope = container.BeginLifetimeScope("activation"))
 {
-	try
-	{
-		var hostedService = scope.Resolve<Bootstrapper>();
-
-		hostedService?.StartAsync(CancellationToken.None).Wait();
-	}
-	catch (AggregateException ex)
-	{
-		foreach (var inner in ex.InnerExceptions)
-		{
-			Console.WriteLine(inner.Message);
-		}
-	}
-	catch (DependencyResolutionException ex)
-	{
-		Console.WriteLine(ex);
-	}
-	catch (Exception ex)
-	{
-		Console.WriteLine(ex.Message);
-	}
+    try
+    {
 #if DEBUG
-	finally
-	{
-		Console.WriteLine("Press any key to exit...");
-		Console.ReadKey();
-	}
+        var hostedService = scope.Resolve<PromptDebuggerBootstrapper>();
+#else
+        var hostedService = scope.Resolve<Bootstrapper>();
+#endif
+
+        hostedService?.StartAsync(CancellationToken.None).Wait();
+    }
+    catch (AggregateException ex)
+    {
+        foreach (var inner in ex.InnerExceptions)
+        {
+            Console.WriteLine(inner.Message);
+        }
+    }
+    catch (DependencyResolutionException ex)
+    {
+        Console.WriteLine(ex);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+#if DEBUG
+    finally
+    {
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
 #endif
 }
